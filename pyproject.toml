@@ -1,0 +1,10 @@
+[project]
+name = "pse-rce-influx-grafana"
+version = "0.1.0"
+description = "Scripts to fetch and plot energy prices, and import to InfluxDB"
+dependencies = [
+    "pandas",
+    "requests",
+    "matplotlib",
+    "influxdb-client"
+]
