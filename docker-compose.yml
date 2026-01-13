@@ -6,17 +6,19 @@ services:
         FROM python:3.13-slim
         RUN mkdir /app
         WORKDIR /app
+        RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
         RUN pip install uv
-        COPY pyproject.toml .
+        RUN curl -o pyproject.toml https://raw.githubusercontent.com/btaczala/energy-charts-influxdb/refs/heads/main/pyproject.toml
         RUN uv sync
-        COPY . .
+        RUN curl -o import_prices_to_influx.py https://raw.githubusercontent.com/btaczala/energy-charts-influxdb/refs/heads/main/import_prices_to_influx.py
+        RUN curl -o energy_prices_script.py https://raw.githubusercontent.com/btaczala/energy-charts-influxdb/refs/heads/main/energy_prices_script.py
         CMD ["uv", "--verbose", "run", "python", "import_prices_to_influx.py", "--loop"]
     container_name: importer
     environment:
       - YEAR=2026
       - BZN=PL
-      - INFLUX_URL=http://192.168.1.58:8086
-      - INFLUX_TOKEN=WffsS4-GvyrMXUXzwumsTzAYxNr4Lrt1Y4-e7yxrjfseIIrexMdbl7HnkQ2rJ-rkYG2n-ewWYra8rTQU1WVM3Q==
-      - INFLUX_ORG=home
-      - INFLUX_BUCKET=prices
+      - INFLUX_URL=YOUR_URL
+      - INFLUX_ORG=YOUR_ORG
+      - INFLUX_BUCKET=YOUR_BUCKET
+      - INFLUX_TOKEN=YOUR_TOKEN
     restart: unless-stopped
