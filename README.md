@@ -1,15 +1,6 @@
 # Energy Charts InfluxDB Importer
 
-This project fetches day-ahead energy prices from [energy-charts.info](https://energy-charts.info/) API, imports them into InfluxDB, and provides visualization tools. It includes Docker support for easy deployment.
-
-## Features
-
-- **Data Fetching**: Retrieve energy price data for any year and bidding zone
-- **InfluxDB Integration**: Automatically import time-series data into InfluxDB
-- **Visualization**: Plot energy prices using Matplotlib
-- **Continuous Import**: Run importer in a loop for real-time updates
-- **Docker Support**: Containerized setup with Docker Compose
-- **Configuration**: Environment-based configuration for easy deployment
+This project fetches day-ahead energy prices from [energy-charts.info](https://energy-charts.info/) API, imports them into InfluxDB.
 
 ## Prerequisites
 
@@ -40,13 +31,6 @@ This project fetches day-ahead energy prices from [energy-charts.info](https://e
    ```bash
    docker-compose up --build
    ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes and test
-4. Submit a pull request
 
 ## License
 
