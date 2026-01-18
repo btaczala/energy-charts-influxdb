@@ -169,7 +169,7 @@ while True:
             )
             logger.info(f"Data written to bucket: '{args.bucket}'")
             logger.info(f"Organization: '{args.org}'")
-            logger.info(f"Measurement: 'energy_prices'")
+            logger.info("Measurement: 'energy_prices'")
             logger.info(f"Tag filter: bzn='{bzn}'")
         except Exception as e:
             logger.error(f"Error writing to InfluxDB: {e}")
