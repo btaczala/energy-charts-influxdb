@@ -1,18 +1,6 @@
 services:
   importer:
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
-        RUN mkdir /app
-        WORKDIR /app
-        RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-        RUN curl -o pyproject.toml https://raw.githubusercontent.com/btaczala/energy-charts-influxdb/refs/heads/main/pyproject.toml
-        RUN uv sync
-        RUN curl -o import_prices_to_influx.py https://raw.githubusercontent.com/btaczala/energy-charts-influxdb/refs/heads/main/import_prices_to_influx.py
-        RUN curl -o energy_prices_script.py https://raw.githubusercontent.com/btaczala/energy-charts-influxdb/refs/heads/main/energy_prices_script.py
-        CMD ["uv", "--verbose", "run", "python", "import_prices_to_influx.py", "--loop"]
-    container_name: importer
+    image: bartekt/energy-charts-to-influxdb:18012026
     environment:
       - YEAR=2026
       - BZN=PL
