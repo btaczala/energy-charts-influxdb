@@ -7,5 +7,5 @@ services:
       - INFLUX_URL=http://192.168.1.58:8086
       - INFLUX_ORG=home
       - INFLUX_BUCKET=prices
-      - INFLUX_TOKEN=WffsS4-GvyrMXUXzwumsTzAYxNr4Lrt1Y4-e7yxrjfseIIrexMdbl7HnkQ2rJ-rkYG2n-ewWYra8rTQU1WVM3Q==
+      - INFLUX_TOKEN=
     restart: unless-stopped
