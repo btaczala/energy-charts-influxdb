@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.19.0
+    hooks:
+      - id: yamlfmt
+  - repo: https://github.com/google/yapf
+    rev: v0.43.0
+    hooks:
+      - id: yapf
+  - repo: https://github.com/turo/pre-commit-hooks
+    rev: v3.5.0 # You may version pin this if desired
+    hooks:
+      - id: docker-lint
+      - id: docker-compose-lint
