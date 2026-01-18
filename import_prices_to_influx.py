@@ -7,33 +7,35 @@ import requests
 import time
 from influxdb_client import InfluxDBClient, Point
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO,
+                    format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 logger.info("Starting energy prices importer...")
 parser = argparse.ArgumentParser(
-    description="Import energy prices for a year into InfluxDB"
-)
-parser.add_argument(
-    "--year", type=int, default=int(os.getenv("YEAR", "2026")), help="Year to import"
-)
-parser.add_argument(
-    "--bzn", type=str, default=os.getenv("BZN", "DE-LU"), help="Bidding zone"
-)
+    description="Import energy prices for a year into InfluxDB")
+parser.add_argument("--year",
+                    type=int,
+                    default=int(os.getenv("YEAR", "2026")),
+                    help="Year to import")
+parser.add_argument("--bzn",
+                    type=str,
+                    default=os.getenv("BZN", "DE-LU"),
+                    help="Bidding zone")
 parser.add_argument(
     "--url",
     type=str,
     default=os.getenv("INFLUX_URL", "http://localhost:8086"),
     help="InfluxDB URL",
 )
-parser.add_argument(
-    "--token", type=str, default=os.getenv("INFLUX_TOKEN", ""), help="InfluxDB token"
-)
-parser.add_argument(
-    "--org", type=str, default=os.getenv("INFLUX_ORG", ""), help="InfluxDB org"
-)
+parser.add_argument("--token",
+                    type=str,
+                    default=os.getenv("INFLUX_TOKEN", ""),
+                    help="InfluxDB token")
+parser.add_argument("--org",
+                    type=str,
+                    default=os.getenv("INFLUX_ORG", ""),
+                    help="InfluxDB org")
 parser.add_argument(
     "--bucket",
     type=str,
@@ -48,8 +50,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 logger.info(f"Configuration - Year: {args.year}, BZN: {args.bzn}")
-logger.info(f"InfluxDB - URL: {args.url}, Org: {args.org}, Bucket: {args.bucket}")
-
+logger.info(
+    f"InfluxDB - URL: {args.url}, Org: {args.org}, Bucket: {args.bucket}")
 
 while True:
     year = args.year
@@ -75,12 +77,15 @@ while True:
         continue
 
     data = response.json()
-    logger.info(f"Received data with {len(data.get('unix_seconds', []))} data points")
+    logger.info(
+        f"Received data with {len(data.get('unix_seconds', []))} data points")
     logger.debug(f"Data keys: {list(data.keys())}")
 
     # Parse timestamps
     logger.info("Parsing timestamps and prices...")
-    timestamps = [pd.to_datetime(ts, unit="s", utc=True) for ts in data["unix_seconds"]]
+    timestamps = [
+        pd.to_datetime(ts, unit="s", utc=True) for ts in data["unix_seconds"]
+    ]
     prices = data["price"]
 
     # Check if InfluxDB connection is possible
@@ -122,8 +127,10 @@ while True:
         try:
             bucket = buckets_api.find_bucket_by_name(args.bucket)
             if bucket is None:
-                logger.warning(f"Bucket '{args.bucket}' not found. Creating it...")
-                buckets_api.create_bucket(bucket_name=args.bucket, org=args.org)
+                logger.warning(
+                    f"Bucket '{args.bucket}' not found. Creating it...")
+                buckets_api.create_bucket(bucket_name=args.bucket,
+                                          org=args.org)
                 logger.info(f"Bucket '{args.bucket}' created successfully.")
             else:
                 logger.info(f"Bucket '{args.bucket}' already exists.")
@@ -137,9 +144,9 @@ while True:
         logger.info(f"Creating {len(timestamps)} data points...")
         points = []
         for i, (ts, price) in enumerate(zip(timestamps, prices)):
-            point = (
-                Point("energy_prices").tag("bzn", bzn).field("price", price).time(ts)
-            )
+            point = (Point("energy_prices").tag("bzn",
+                                                bzn).field("price",
+                                                           price).time(ts))
             points.append(point)
             if i < 3:  # Show first 3 points as examples
                 logger.debug(f"  Point {i + 1}: timestamp={ts}, price={price}")
@@ -188,10 +195,12 @@ while True:
 
         try:
             result = query_api.query(count_query)
-            logger.debug(f"Count query executed. Tables returned: {len(result)}")
+            logger.debug(
+                f"Count query executed. Tables returned: {len(result)}")
             for table in result:
                 for record in table.records:
-                    logger.info(f"Total records in bucket: {record.get_value()}")
+                    logger.info(
+                        f"Total records in bucket: {record.get_value()}")
 
             # Now check for recent data with timestamps - exact match to Data Explorer format
             logger.info("Running Data Explorer style query...")
@@ -210,7 +219,8 @@ while True:
             )
 
             if len(result) == 0:
-                logger.warning("No data found with exact Data Explorer format!")
+                logger.warning(
+                    "No data found with exact Data Explorer format!")
                 logger.info("Checking what's actually in the bucket...")
 
                 # Check for any data in the last 24 hours
@@ -227,7 +237,8 @@ while True:
                     logger.info("Sample raw data found:")
                     for table in result:
                         for record in table.records:
-                            logger.debug(f"Measurement: {record.get_measurement()}")
+                            logger.debug(
+                                f"Measurement: {record.get_measurement()}")
                             logger.debug(f"Field: {record.get_field()}")
                             logger.debug(f"Value: {record.get_value()}")
                             logger.debug(f"Tags: {record.values}")
@@ -236,7 +247,8 @@ while True:
 
                 logger.info("Exact Data Explorer query to use:")
                 logger.info(f'from(bucket: "{args.bucket}")')
-                logger.info("|> range(start: v.timeRangeStart, stop: v.timeRangeStop)")
+                logger.info(
+                    "|> range(start: v.timeRangeStart, stop: v.timeRangeStop)")
                 logger.info(
                     '|> filter(fn: (r) => r["_measurement"] == "energy_prices")'
                 )
@@ -292,7 +304,8 @@ while True:
                 logger.info(f"BZN tags found: {tags}")
 
                 # Check for specific field names
-                logger.info("Checking field names for energy_prices measurement...")
+                logger.info(
+                    "Checking field names for energy_prices measurement...")
                 fields_query = f'''
                 from(bucket: "{args.bucket}")
                   |> range(start: -7d)
